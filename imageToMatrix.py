@@ -52,8 +52,8 @@ def discretize_image(image_path, grid_size=10, output_csv="maze_matrix.csv"):
     return maze_matrix
 
 # Ejemplo de uso:
-matrix = discretize_image("turing.bmp", grid_size=5)
-#matrix = discretize_image("Test2.bmp", grid_size=5)
-#matrix = discretize_image("Test.bmp", grid_size=5)
-#matrix = discretize_image("Prueba Lab1.bmp", grid_size=5)
+matrix = discretize_image("images/turing.bmp", grid_size=5)
+#matrix = discretize_image("images/Test2.bmp", grid_size=5)
+#matrix = discretize_image("images/Test.bmp", grid_size=5)
+#matrix = discretize_image("images/Prueba Lab1.bmp", grid_size=5)
 print(matrix)
