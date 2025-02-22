@@ -34,6 +34,40 @@ class MazeSolver:
                     positions.append((i, j))
         return positions
 
+    def actions(self, s):
+        """Devuelve las acciones posibles desde el estado s."""
+        # s tiene la forma de tupla (x,y)
+        x, y = s
+        posibles_acciones = []
+
+        # se itera en la lista de tuplas (posibples movimientos)
+        for dx, dy in self.moves:
+            
+            nx, ny = x + dx, y + dy
+
+            # las primeras 2 condiciones es para evitar los casos out of bounds de la matriz.
+
+            # la tercera condicion es para ver que no sea una pared.
+            if 0 <= nx < self.rows and 0 <= ny < self.cols and self.matrix[nx][ny] != '1':
+                posibles_acciones.append((dx, dy))
+
+        return posibles_acciones
+
+    def cost(self, s, a, s_prime):
+        """Devuelve el costo de moverse de s a s' con la acción a."""
+        # por temas de simplicidad y que el laberitno es igual en todas las direcciones colocamos costo constante.
+        return 1 
+
+    def results(self, s, a):
+        """Devuelve el nuevo estado después de aplicar la acción a en s."""
+        x, y = s
+        dx, dy = a
+        return (x + dx, y + dy)
+
+    def goalTest(self, s):
+        """Verifica si el estado s es una meta."""
+        return s in self.goals
+
     def get_neighbors(self, node):
         """Devuelve los vecinos válidos de un nodo."""
         neighbors = []
