@@ -4,7 +4,7 @@ from collections import deque
 # un poco de tipado para que sea un cachito mas lejible
 from typing import List, Tuple, Optional
 
-class MazeSolver:
+class Maze:
     def __init__(self, csv_file):
         self.matrix = self.load_csv(csv_file)
         self.rows = len(self.matrix)
@@ -70,9 +70,13 @@ class MazeSolver:
         """Verifica si el estado s es una meta."""
         return s in self.goals
 
+class GraphSearch:
+    def __init__(self, maze:Maze):
+        self.maze = maze        
+
     def bfs(self) -> Optional[List[Tuple[int, int]]]:
         """Implementación de BFS (búsqueda en anchura)."""
-        queue = deque([(self.start, [])])
+        queue = deque([(self.maze.start, [])])
         visited = set()
 
         while queue:
@@ -82,18 +86,18 @@ class MazeSolver:
             visited.add(node)
             path = path + [node]
 
-            if node in self.goals:
+            if node in self.maze.goals:
                 return path  # Camino encontrado
 
-            for action in self.actions(node):
-                neighbor = self.results(node, action)
+            for action in self.maze.actions(node):
+                neighbor = self.maze.results(node, action)
                 queue.append((neighbor, path))
 
         return None  # No se encontró camino
 
     def dfs(self) -> Optional[List[Tuple[int, int]]]:
         """Implementación de DFS (búsqueda en profundidad)."""
-        stack = [(self.start, [])]
+        stack = [(self.maze.start, [])]
         visited = set()
 
         while stack:
@@ -103,11 +107,11 @@ class MazeSolver:
             visited.add(node)
             path = path + [node]
 
-            if node in self.goals:
+            if node in self.maze.goals:
                 return path
 
-            for action in self.actions(node):
-                neighbor = self.results(node, action)
+            for action in self.maze.actions(node):
+                neighbor = self.maze.results(node, action)
                 stack.append((neighbor, path))
 
 
@@ -124,8 +128,8 @@ class MazeSolver:
         heuristic_func = manhattan if heuristic == "manhattan" else euclidean
 
         open_set = []
-        heapq.heappush(open_set, (0, self.start, []))
-        g_costs = {self.start: 0}
+        heapq.heappush(open_set, (0, self.maze.start, []))
+        g_costs = {self.maze.start: 0}
         visited = set()
 
         while open_set:
@@ -135,30 +139,20 @@ class MazeSolver:
             visited.add(node)
             path = path + [node]
 
-            if node in self.goals:
+            if node in self.maze.goals:
                 return path  # Camino encontrado
 
-            for action in self.actions(node):
-                neighbor = self.results(node, action)
-                new_cost = g_costs[node] + self.cost(node, action, neighbor)
+            for action in self.maze.actions(node):
+                neighbor = self.maze.results(node, action)
+                new_cost = g_costs[node] + self.maze.cost(node, action, neighbor)
                 if neighbor not in g_costs or new_cost < g_costs[neighbor]:
                     g_costs[neighbor] = new_cost
-                    priority = new_cost + min(heuristic_func(neighbor, goal) for goal in self.goals)
+                    priority = new_cost + min(heuristic_func(neighbor, goal) for goal in self.maze.goals)
                     heapq.heappush(open_set, (priority, neighbor, path))
 
         return None  # No se encontró camino
 
 # Todas las busquedas regresan una lista de tuplas con enteros, practicamente el camino, lista de coordenadas x,y
-
-# **Ejecutar los algoritmos con el CSV**
-if __name__ == "__main__":
-    solver = MazeSolver("maze_matrix.csv")
-
-    print("BFS Path:", solver.bfs())
-    print("DFS Path:", solver.dfs())
-    print("A* (Manhattan) Path:", solver.a_star("manhattan"))
-    print("A* (Euclidean) Path:", solver.a_star("euclidean"))
-
 
         # Se han elegido dos heurísticas distintas para A*:
         # 1. Heurística de Manhattan: Se usa porque en este laberinto solo se permiten movimientos ortogonales 
