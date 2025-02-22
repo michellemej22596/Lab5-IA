@@ -1,6 +1,8 @@
 import csv
 import heapq
 from collections import deque
+# un poco de tipado para que sea un cachito mas lejible
+from typing import List, Tuple, Optional
 
 class MazeSolver:
     def __init__(self, csv_file):
@@ -68,17 +70,7 @@ class MazeSolver:
         """Verifica si el estado s es una meta."""
         return s in self.goals
 
-    def get_neighbors(self, node):
-        """Devuelve los vecinos válidos de un nodo."""
-        neighbors = []
-        x, y = node
-        for dx, dy in self.moves:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < self.rows and 0 <= ny < self.cols and self.matrix[nx][ny] != '1':  # No es pared
-                neighbors.append((nx, ny))
-        return neighbors
-
-    def bfs(self):
+    def bfs(self) -> Optional[List[Tuple[int, int]]]:
         """Implementación de BFS (búsqueda en anchura)."""
         queue = deque([(self.start, [])])
         visited = set()
@@ -93,12 +85,13 @@ class MazeSolver:
             if node in self.goals:
                 return path  # Camino encontrado
 
-            for neighbor in self.get_neighbors(node):
+            for action in self.actions(node):
+                neighbor = self.results(node, action)
                 queue.append((neighbor, path))
 
         return None  # No se encontró camino
 
-    def dfs(self):
+    def dfs(self) -> Optional[List[Tuple[int, int]]]:
         """Implementación de DFS (búsqueda en profundidad)."""
         stack = [(self.start, [])]
         visited = set()
@@ -113,12 +106,14 @@ class MazeSolver:
             if node in self.goals:
                 return path
 
-            for neighbor in self.get_neighbors(node):
+            for action in self.actions(node):
+                neighbor = self.results(node, action)
                 stack.append((neighbor, path))
+
 
         return None
 
-    def a_star(self, heuristic="manhattan"):
+    def a_star(self, heuristic="manhattan") -> Optional[List[Tuple[int, int]]]:
         """Implementación de A* con heurísticas Manhattan o Euclidiana."""
         def manhattan(a, b):
             return abs(a[0] - b[0]) + abs(a[1] - b[1])
@@ -143,8 +138,9 @@ class MazeSolver:
             if node in self.goals:
                 return path  # Camino encontrado
 
-            for neighbor in self.get_neighbors(node):
-                new_cost = g_costs[node] + 1
+            for action in self.actions(node):
+                neighbor = self.results(node, action)
+                new_cost = g_costs[node] + self.cost(node, action, neighbor)
                 if neighbor not in g_costs or new_cost < g_costs[neighbor]:
                     g_costs[neighbor] = new_cost
                     priority = new_cost + min(heuristic_func(neighbor, goal) for goal in self.goals)
@@ -152,6 +148,7 @@ class MazeSolver:
 
         return None  # No se encontró camino
 
+# Todas las busquedas regresan una lista de tuplas con enteros, practicamente el camino, lista de coordenadas x,y
 
 # **Ejecutar los algoritmos con el CSV**
 if __name__ == "__main__":
