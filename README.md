@@ -44,4 +44,5 @@ pip install opencv-python numpy
 
 ## Video de la ejecución:
 
-[![Watch the video](https://img.youtube.com/vi/TvhOjY4-IrA/0.jpg)](https://youtu.be/TvhOjY4-IrA)
+[![Watch the video](https://img.youtube.com/vi/IjdqCz4Nqqk/0.jpg)](https://youtu.be/IjdqCz4Nqqk)
+
