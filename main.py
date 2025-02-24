@@ -1,5 +1,8 @@
 from imageToMatrix import discretize_image
 from maze_solver import Maze, GraphSearch
+import matplotlib.pyplot as plt
+import numpy as np
+import csv
 
 # Lista de diccionarios con el nombre del archivo y el tamaño del grid
 files = [
@@ -11,14 +14,14 @@ files = [
 
 option = ""
 
-while option != "5":
-    print("Bienvenido escribe el nombre del archivo que deseas probar o 5 para salir")
+while option != "6":
+    print("\nBienvenido. Selecciona el número del laberinto que deseas probar:")
+    for i, file in enumerate(files):
+        print(f"{i + 1}. {file['name']} (Grid Size: {file['grid_size']})")
+    print("5. Cargar archivo personalizado")
+    print("6. Salir")
     
-    for i in range(len(files)):
-        print(f"{i + 1}. {files[i]['name']} (Grid Size: {files[i]['grid_size']})")
-    print("5. Salir")
-
-    option = input()
+    option = input("Ingresa tu opción: ").strip()
 
     # Verificar si la opción es válida
     if option in [file["name"] for file in files]:
@@ -74,11 +77,35 @@ while option != "5":
             else:
                 print("Opción no válida. Intenta de nuevo.")
 
-            
-            # Nelson aqui podes poner tu parte, el path es una lista the tuplas (x,y). del objeto que se llama maze en este archivo
-            # usa maze.matrix par obtener la matriz, se me ocurre que podes usar maze.matrix y la variable path para hacer un csv de resultado
-            # y luego usar matplotlib para mostrar dicho csv donde esta el mapa con el path
-            # en el lab le pusieron morado
             if path:
                 print("Mostrando el resultado.")
-                # :)
+
+                # Asumimos que maze.matrix es una matriz 2D con los valores '0', '1', '2' y '3'
+                rows = len(maze.matrix)
+                cols = len(maze.matrix[0])
+                
+                # Creamos una imagen RGB donde asignamos un color a cada tipo de celda:
+                # '0' -> blanco (camino libre), '1' -> negro (pared), 
+                # '2' -> rojo (inicio) y '3' -> verde (meta)
+                color_img = np.zeros((rows, cols, 3), dtype=np.uint8)
+                for i in range(rows):
+                    for j in range(cols):
+                        if maze.matrix[i][j] == '0':
+                            color_img[i, j] = [255, 255, 255]   # blanco
+                        elif maze.matrix[i][j] == '1':
+                            color_img[i, j] = [0, 0, 0]           # negro
+                        elif maze.matrix[i][j] == '2':
+                            color_img[i, j] = [255, 0, 0]         # rojo (inicio)
+                        elif maze.matrix[i][j] == '3':
+                            color_img[i, j] = [0, 255, 0]         # verde (meta)
+                
+                # Recorrer el path y marcar cada celda con color morado (por ejemplo: RGB [128, 0, 128])
+                for (i, j) in path:
+                    color_img[i, j] = [128, 0, 128]
+
+                # Mostrar la imagen con matplotlib
+                plt.figure(figsize=(8, 8))
+                plt.imshow(color_img)
+                plt.title("Laberinto con camino (morado)")
+                plt.axis('off')
+                plt.show()
